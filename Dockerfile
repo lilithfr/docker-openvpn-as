@@ -1,11 +1,11 @@
-FROM ghcr.io/linuxserver/baseimage-ubuntu:bionic
+FROM ghcr.io/linuxserver/baseimage-debian:bookworm
 
 # set version label
 ARG BUILD_DATE
 ARG VERSION
 ARG OPENVPNAS_VERSION 
 LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
-LABEL maintainer="aptalca"
+LABEL maintainer="nobody"
 
 # environment settings
 ARG DEBIAN_FRONTEND="noninteractive"
@@ -36,8 +36,8 @@ RUN \
 	libnfnetlink0 \
 	libpcap0.8 \
 	libpython3-stdlib \
-	libpython3.6-minimal \
-	libpython3.6-stdlib \
+	libpython3-minimal \
+	libpython3-stdlib \
 	libxtables12 \
 	mime-support \
 	multiarch-support \
@@ -56,17 +56,12 @@ RUN \
 	python3-sqlalchemy \
 	python3-sqlparse \
 	python3-tempita \
-	python3.6 \
-	python3.6-minimal \
+	python3-minimal \
 	sqlite3 \
 	xz-utils && \
  echo "**** add openvpn-as repo ****" && \
  curl -s https://as-repository.openvpn.net/as-repo-public.gpg | apt-key add - && \
- echo "deb http://as-repository.openvpn.net/as/debian bionic main">/etc/apt/sources.list.d/openvpn-as-repo.list && \
- if [ -z ${OPENVPNAS_VERSION+x} ]; then \
-	OPENVPNAS_VERSION=$(curl -sX GET http://as-repository.openvpn.net/as/debian/dists/bionic/main/binary-amd64/Packages.gz | gunzip -c \
-	|grep -A 7 -m 1 "Package: openvpn-as" | awk -F ": " '/Version/{print $2;exit}');\
- fi && \
+ echo "deb http://as-repository.openvpn.net/as/debian bookworm main">/etc/apt/sources.list.d/openvpn-as-repo.list && \
  echo "$OPENVPNAS_VERSION" > /version.txt && \
  echo "**** ensure home folder for abc user set to /config ****" && \
  usermod -d /config abc && \
